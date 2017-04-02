@@ -30,7 +30,7 @@ source "${HI_CLI_HOME}/bin/colors"
 source "${HI_CLI_HOME}/bin/logging"
 ###############################################################################
 function run() {
-  cli="ansible ${hosts_conf} ${arg3} -m ping"
+  cli="ansible ${hosts_conf} ${arg3} -m ping ${verbose}"
 
   ${cli}
 
