@@ -30,9 +30,19 @@ source "${HI_CLI_HOME}/bin/colors"
 source "${HI_CLI_HOME}/bin/logging"
 ###############################################################################
 function run() {
-  cli="ansible ${hosts_conf} ${arg3} -m ping ${verbose}"
-
-  ${cli}
+  log_debug "cmd_line: ${CMD_LINE}"
+  ansible_target_hosts=${arg3}
+  ansible_module=${arg2}
+  log_debug "${ansible_module} ${ansible_target_hosts}"
+  args="${CMD_LINE/hi ansible ${ansible_module} ${ansible_target_hosts}/}"
+  args=$(echo ${args} | xargs)
+  if [ "${args}" != "" ]; then
+    cli="ansible ${hosts_conf} ${ansible_target_hosts} -m ${ansible_module} -a "'"'"${args}"'"'" "
+    ansible ${hosts_conf} ${ansible_target_hosts} -m ${ansible_module} -a "${args}"
+  else
+    cli="ansible ${hosts_conf} ${ansible_target_hosts} -m ${ansible_module} "
+    ansible ${hosts_conf} ${ansible_target_hosts} -m ${ansible_module}
+  fi
 
   result=$?
 
