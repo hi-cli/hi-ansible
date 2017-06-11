@@ -35,10 +35,21 @@ function run() {
   ansible_module=${arg2}
   log_debug "${ansible_module} ${ansible_target_hosts}"
   args="${CMD_LINE/hi ansible ${ansible_module} ${ansible_target_hosts}/}"
+  args="${args/hi_debug/}"
   args=$(echo ${args} | xargs)
+
   if [ "${args}" != "" ]; then
     cli="ansible ${hosts_conf} ${ansible_target_hosts} -m ${ansible_module} -a "'"'"${args}"'"'" "
-    ansible ${hosts_conf} ${ansible_target_hosts} -m ${ansible_module} -a "${args}"
+
+    if [ $(echo "${args}" | grep "rm -" | wc -l) != 0 ]; then
+      log_info "${cli}"
+      if ! prompt_yesorno "Do you wish to execute above command? [yes/no]"; then
+        log_info "aborted"
+        exit  
+      fi
+    fi   
+
+    ansible ${hosts_conf} ${ansible_target_hosts} -m ${ansible_module} -a "${args}" 
   else
     cli="ansible ${hosts_conf} ${ansible_target_hosts} -m ${ansible_module} "
     ansible ${hosts_conf} ${ansible_target_hosts} -m ${ansible_module}
